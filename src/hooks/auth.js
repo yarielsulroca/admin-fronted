@@ -12,43 +12,60 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             .get('/api/user')
             .then(res => res.data)
             .catch(error => {
-                if (error.response.status !== 409) throw error
-
-                router.push('/verify-email')
+                if (error.response?.status === 401) {
+                    localStorage.removeItem('auth_token')
+                    return null
+                }
+                throw error
             }),
     )
 
     const csrf = () => axios.get('/sanctum/csrf-cookie')
 
     const register = async ({ setErrors, ...props }) => {
-        await csrf()
+        try {
+            setErrors([])
+            const response = await axios.post('/api/register', props)
+            const { token, user } = response.data
 
-        setErrors([])
-
-        axios
-            .post('/register', props)
-            .then(() => mutate())
-            .catch(error => {
-                if (error.response.status !== 422) throw error
-
+            // Guardar el token en localStorage
+            localStorage.setItem('auth_token', token)
+            
+            // Actualizar el estado del usuario
+            await mutate(user)
+            
+            // Redirigir al dashboard
+            router.push('/dashboard')
+        } catch (error) {
+            if (error.response?.status === 422) {
                 setErrors(error.response.data.errors)
-            })
+            }
+        }
     }
 
     const login = async ({ setErrors, setStatus, ...props }) => {
-        await csrf()
+        try {
+            setErrors([])
+            setStatus(null)
 
-        setErrors([])
-        setStatus(null)
+            const response = await axios.post('/api/login', props)
+            const { token, user } = response.data
 
-        axios
-            .post('/login', props)
-            .then(() => mutate())
-            .catch(error => {
-                if (error.response.status !== 422) throw error
-
+            // Guardar el token en localStorage
+            localStorage.setItem('auth_token', token)
+            
+            // Actualizar el estado del usuario
+            await mutate(user)
+            
+            // Redirigir al dashboard
+            router.push('/dashboard')
+        } catch (error) {
+            if (error.response?.status === 422) {
                 setErrors(error.response.data.errors)
-            })
+            } else {
+                setErrors({ email: ['Credenciales inválidas'] })
+            }
+        }
     }
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
@@ -92,26 +109,23 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 
     const logout = async () => {
-        if (!error) {
-            await axios.post('/logout').then(() => mutate())
+        try {
+            await axios.post('/api/logout')
+            localStorage.removeItem('auth_token')
+            await mutate(null)
+            router.push('/login')
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error)
         }
-
-        window.location.pathname = '/login'
     }
 
     useEffect(() => {
-        if (middleware === 'guest' && redirectIfAuthenticated && user)
+        if (middleware === 'guest' && redirectIfAuthenticated && user) {
             router.push(redirectIfAuthenticated)
-
-        if (middleware === 'auth' && (user && !user.email_verified_at))
-            router.push('/verify-email')
-        
-        if (
-            window.location.pathname === '/verify-email' &&
-            user?.email_verified_at
-        )
-            router.push(redirectIfAuthenticated)
-        if (middleware === 'auth' && error) logout()
+        }
+        if (middleware === 'auth' && error) {
+            logout()
+        }
     }, [user, error])
 
     return {
