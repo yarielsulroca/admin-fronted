@@ -232,6 +232,14 @@ export default function ClientsTable() {
                                         >
                                             Eliminar
                                         </button>
+                                        <a
+                                            href={`/clients/${client.id}/preview`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
+                                        >
+                                            Ver Pantalla
+                                        </a>
                                     </td>
                                 </tr>
                             ))}

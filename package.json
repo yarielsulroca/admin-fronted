@@ -13,6 +13,7 @@
     "@headlessui/react": "^1.4.2",
     "@heroicons/react": "^2.2.0",
     "axios": "^0.21.1",
+    "caniuse-lite": "^1.0.30001717",
     "next": "^14.2.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

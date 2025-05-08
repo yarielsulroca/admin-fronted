@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import axios from '@/lib/axios'
 
-const ClientsCard = () => {
+const ClientsCard = ({ onLoad }) => {
     const [clientCount, setClientCount] = useState(0)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -20,11 +20,12 @@ const ClientsCard = () => {
                 setError(err.response?.data?.message || 'Error al obtener la cantidad de clientes')
             } finally {
                 setLoading(false)
+                onLoad?.()
             }
         }
 
         fetchClientCount()
-    }, [])
+    }, [onLoad])
 
     if (loading) {
         return (

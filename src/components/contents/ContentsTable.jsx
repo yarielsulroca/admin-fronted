@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import axios from '@/lib/axios'
 import Loader from '@/components/Loader'
 import { useRouter } from 'next/navigation'
+import AssociateContentModal from './AssociateContentModal'
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
@@ -22,6 +23,8 @@ export default function ContentsTable() {
     const [editing, setEditing] = useState(null)
     const [wsStatus, setWsStatus] = useState({}) // Estado simulado de WebSocket
     const router = useRouter()
+    const [showAssociateModal, setShowAssociateModal] = useState(false)
+    const [selectedContentId, setSelectedContentId] = useState(null)
 
     useEffect(() => {
         fetchContents()
@@ -94,6 +97,16 @@ export default function ContentsTable() {
         setWsStatus(prev => ({ ...prev, [id]: random }))
         // Redirigir a la vista de transmisión simulada
         router.push(`/contents/${id}/preview`)
+    }
+
+    const openAssociateModal = (contentId) => {
+        setSelectedContentId(contentId)
+        setShowAssociateModal(true)
+    }
+
+    const closeAssociateModal = () => {
+        setShowAssociateModal(false)
+        setSelectedContentId(null)
     }
 
     // Filtros
@@ -244,6 +257,13 @@ export default function ContentsTable() {
                                                 >
                                                     Simular WS
                                                 </button>
+                                                <button
+                                                    className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+                                                    onClick={() => openAssociateModal(content.id)}
+                                                    type="button"
+                                                >
+                                                    Asociar a cliente
+                                                </button>
                                                 <span className={`ml-2 text-xs px-2 py-1 rounded 
                                                     ${wsStatus && wsStatus[content.id] === 'En reproducción' ? 'bg-green-100 text-green-700' :
                                                       wsStatus && wsStatus[content.id] === 'Error' ? 'bg-red-100 text-red-700' :
@@ -267,6 +287,12 @@ export default function ContentsTable() {
                     </table>
                 )}
             </div>
+
+            <AssociateContentModal
+                contentId={selectedContentId}
+                open={showAssociateModal}
+                onClose={closeAssociateModal}
+            />
         </div>
     )
 } 
