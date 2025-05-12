@@ -7,15 +7,13 @@ import ClientsCard from '@/components/dashboard/cards/ClientsCard'
 import HeadquartersCard from '@/components/dashboard/cards/HeadquartersCard'
 import ScreensCard from '@/components/dashboard/cards/ScreensCard'
 import ContentsCard from '@/components/dashboard/cards/ContentsCard'
-import ContentStreamingCard from '@/components/dashboard/cards/ContentStreamingCard'
 
 const Dashboard = () => {
     const [loadedComponents, setLoadedComponents] = useState({
         clients: false,
         headquarters: false,
         screens: false,
-        contents: false,
-        streaming: false
+        contents: false
     })
 
     // Función para marcar un componente como cargado
@@ -37,9 +35,6 @@ const Dashboard = () => {
                         <HeadquartersCard onLoad={() => handleComponentLoad('headquarters')} />
                         <ScreensCard onLoad={() => handleComponentLoad('screens')} />
                         <ContentsCard onLoad={() => handleComponentLoad('contents')} />
-                        <div className="md:col-span-2">
-                            <ContentStreamingCard onLoad={() => handleComponentLoad('streaming')} />
-                        </div>
                     </div>
                 </div>
             </div>

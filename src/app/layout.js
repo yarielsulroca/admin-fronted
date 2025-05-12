@@ -18,10 +18,12 @@ const RootLayout = ({ children }) => {
             <head>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <Script src="/assets/js/main.js" strategy="beforeInteractive" />
-                <Script src="/assets/js/index.js" strategy="beforeInteractive" />
             </head>
-            <body className="antialiased bg-gray-100">{children}</body>
+            <body className="antialiased bg-gray-100">
+                {children}
+                <Script src="/assets/js/main.js" strategy="afterInteractive" />
+                <Script src="/assets/js/index.js" strategy="afterInteractive" />
+            </body>
         </html>
     )
 }
